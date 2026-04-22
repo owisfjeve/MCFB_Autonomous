@@ -1,7 +1,7 @@
 {
   "name": "mcfb-autonomous-ai",
-  "version": "2.0.0",
-  "description": "Autonomous AI Agent for @MCFB_MODS",
+  "version": "2.1.0",
+  "description": "Autonomous AI Agent for @MCFB_MODS with Keep-Alive",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,6 +10,7 @@
     "node-telegram-bot-api": "^0.64.0",
     "groq-sdk": "^0.3.3",
     "express": "^4.18.2",
-    "node-cron": "^3.0.3"
+    "node-cron": "^3.0.3",
+    "axios": "^1.6.0"
   }
 }
