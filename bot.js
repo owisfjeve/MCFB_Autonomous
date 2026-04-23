@@ -1,35 +1,29 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
-app.get('/', (req, res) => res.send('Bot is Alive!'));
-app.listen(process.env.PORT || 10000);
+app.use(bodyParser.json());
 
 const token = process.env.TELE_TOKEN;
+const url = process.env.RENDER_EXTERNAL_URL; // رابط السيرفر حقك في ريندر
+const port = process.env.PORT || 10000;
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-// إعداد البوت مع تعطيل التكرار
-const bot = new TelegramBot(token, { polling: false }); 
-
-// دالة لتشغيل البوت بنظافة
-async function startBot() {
-    try {
-        // مسح أي اتصال قديم (هذا بيحل مشكلة الـ 409)
-        await bot.deleteWebHook();
-        console.log("--- تم تنظيف الاتصالات القديمة ---");
-        
-        // تشغيل الاستقبال الجديد
-        bot.startPolling();
-        console.log("--- ⚡ البوت جاهز للعمل بنظام Gemini ---");
-    } catch (e) {
-        console.error("خطأ في التشغيل:", e.message);
-    }
-}
-
 const model = genAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
-    systemInstruction: "أنت 'لوريس الصغير'، المساعد الذكي لفريق UMFB. تحدث باللهجة السعودية، كن خبيراً ومرحاً."
+    systemInstruction: "أنت 'لوريس الصغير'، المساعد الذكي لفريق UMFB. تحدث باللهجة السعودية، كن مرحاً وخبيراً."
+});
+
+// إعداد البوت بنظام Webhook
+const bot = new TelegramBot(token);
+bot.setWebHook(`${url}/bot${token}`);
+
+// استقبال الرسائل من تيليجرام عبر هذا الرابط
+app.post(`/bot${token}`, (req, res) => {
+    bot.processUpdate(req.body);
+    res.sendStatus(200);
 });
 
 bot.on('message', async (msg) => {
@@ -40,8 +34,12 @@ bot.on('message', async (msg) => {
         const response = await result.response;
         bot.sendMessage(msg.chat.id, response.text());
     } catch (e) {
-        bot.sendMessage(msg.chat.id, "معليش يا لوريس، صار ضغط على مخي.");
+        console.error(e);
     }
 });
 
-startBot();
+app.get('/', (req, res) => res.send('لوريس الصغير شغال تمام!'));
+
+app.listen(port, () => {
+    console.log(`سيرفر البوت شغال على منفذ ${port}`);
+});
