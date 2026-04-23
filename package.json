@@ -1,0 +1,14 @@
+{
+  "name": "umfb-expert-bot",
+  "version": "1.0.0",
+  "description": "The Official UMFB Gemini Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "node-telegram-bot-api": "^0.66.0",
+    "express": "^4.19.2"
+  }
+}
